@@ -100,7 +100,7 @@ src/
 
 1. 레포지토리 클론
 ```bash
-git clone https://github.com/{팀장_깃허브_아이디}/kw-lost-and-found.git
+git clone https://github.com/kw-oop-team3/lost-item-system.git
 ```
 
 2. 프로젝트 열기
