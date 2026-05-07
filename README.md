@@ -1,7 +1,7 @@
 # 🔍 KW Lost and Found
 > 광운대학교 캠퍼스 분실물 관리 시스템
 
-![Java](https://img.shields.io/badge/Java-17-orange?style=flat-square&logo=java)
+![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=java)
 ![OOP](https://img.shields.io/badge/OOP-Project-blue?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-In%20Progress-yellow?style=flat-square)
 
@@ -27,7 +27,7 @@
 
 ## 🛠️ 기술 스택
 
-- **Language** : Java 17
+- **Language** : Java 21
 - **IDE** : IntelliJ IDEA / Eclipse
 - **협업** : GitHub
 
