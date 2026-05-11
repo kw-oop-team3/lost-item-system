@@ -12,6 +12,11 @@ import service.ReturnService;
 import user.LoginResult;
 import user.User;
 import user.UserRepository;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -38,7 +43,6 @@ public class Main {
         scanner.close();
     }
 
-    // 로그인/회원가입 화면 — null 반환 시 종료
     private static User loginMenu(Scanner scanner, UserRepository userRepository) {
         while (true) {
             System.out.println("\n=== KW Lost and Found ===");
@@ -84,7 +88,6 @@ public class Main {
         }
     }
 
-    // 로그인 후 메인 메뉴 — 관리자/학생 권한에 따라 다른 메뉴
     private static void mainMenu(Scanner scanner, User user,
                                   ItemService itemService, ReturnService returnService,
                                   LostItemRepository repository) {
@@ -110,7 +113,7 @@ public class Main {
             if (user.canRegisterItem()) {
                 switch (choice) {
                     case "1": handleRegisterItem(scanner, itemService, user); break;
-                    case "2": handleListAll(repository); break;
+                    case "2": handleListAll(scanner, repository); break;
                     case "3": handleSearch(scanner, repository); break;
                     case "4": handleChangeStatus(scanner, itemService, user); break;
                     case "5": handleReturn(scanner, returnService, user); break;
@@ -119,7 +122,7 @@ public class Main {
                 }
             } else {
                 switch (choice) {
-                    case "1": handleListAll(repository); break;
+                    case "1": handleListAll(scanner, repository); break;
                     case "2": handleSearch(scanner, repository); break;
                     case "0": System.out.println("로그아웃합니다."); return;
                     default:  System.out.println("올바른 메뉴를 선택해주세요.");
@@ -149,12 +152,24 @@ public class Main {
         if (foundDate == null) return;
 
         LostItem item = itemService.registerItem(user, itemName, category, foundLocation, storageLocation, foundDate);
-        if (item != null) {
-            System.out.println("등록 완료: " + item);
+        if (item == null) return;
+
+        System.out.println("등록 완료: " + item);
+
+        // 사진 등록 여부 확인
+        System.out.print("사진을 등록하시겠습니까? (y/n): ");
+        if (scanner.nextLine().trim().equalsIgnoreCase("y")) {
+            String imagePath = chooseImageFile();
+            if (imagePath != null) {
+                item.setImagePath(imagePath);
+                System.out.println("사진이 등록되었습니다.");
+            } else {
+                System.out.println("사진 선택이 취소되었습니다.");
+            }
         }
     }
 
-    private static void handleListAll(LostItemRepository repository) {
+    private static void handleListAll(Scanner scanner, LostItemRepository repository) {
         List<LostItem> items = repository.findAll();
         if (items.isEmpty()) {
             System.out.println("등록된 분실물이 없습니다.");
@@ -162,8 +177,11 @@ public class Main {
         }
         System.out.println("=== 분실물 목록 (" + items.size() + "건) ===");
         for (LostItem item : items) {
-            System.out.println(item);
+            String photoMark = item.getImagePath() != null ? " [사진 있음]" : "";
+            System.out.println(item + photoMark);
         }
+
+        promptViewPhoto(scanner, repository);
     }
 
     private static void handleSearch(Scanner scanner, LostItemRepository repository) {
@@ -187,11 +205,29 @@ public class Main {
         List<LostItem> results = repository.search(strategy, keyword);
         if (results.isEmpty()) {
             System.out.println("검색 결과가 없습니다.");
-        } else {
-            System.out.println("=== 검색 결과 " + results.size() + "건 ===");
-            for (LostItem item : results) {
-                System.out.println(item);
-            }
+            return;
+        }
+
+        System.out.println("=== 검색 결과 " + results.size() + "건 ===");
+        for (LostItem item : results) {
+            String photoMark = item.getImagePath() != null ? " [사진 있음]" : "";
+            System.out.println(item + photoMark);
+        }
+
+        promptViewPhoto(scanner, repository);
+    }
+
+    // 목록 출력 후 사진 조회 제안
+    private static void promptViewPhoto(Scanner scanner, LostItemRepository repository) {
+        System.out.print("\n사진을 볼 분실물 ID (엔터 시 건너뜀): ");
+        String input = scanner.nextLine().trim();
+        if (input.isEmpty()) return;
+
+        try {
+            int id = Integer.parseInt(input);
+            repository.findById(id).ifPresent(item -> showImage(item));
+        } catch (NumberFormatException e) {
+            System.out.println("올바른 ID를 입력해주세요.");
         }
     }
 
@@ -234,6 +270,55 @@ public class Main {
         returnService.returnItem(user, id);
     }
 
+    // ── Swing: 이미지 파일 선택 ──────────────────────────────────────
+    private static String chooseImageFile() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("사진 파일 선택");
+        chooser.setFileFilter(new FileNameExtensionFilter(
+                "이미지 파일 (JPG, PNG, GIF)", "jpg", "jpeg", "png", "gif"));
+
+        int result = chooser.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            return chooser.getSelectedFile().getAbsolutePath();
+        }
+        return null;
+    }
+
+    // ── Swing: 이미지 창 표시 ────────────────────────────────────────
+    private static void showImage(LostItem item) {
+        if (item.getImagePath() == null) {
+            System.out.println("등록된 사진이 없습니다.");
+            return;
+        }
+
+        File file = new File(item.getImagePath());
+        if (!file.exists()) {
+            System.out.println("이미지 파일을 찾을 수 없습니다: " + item.getImagePath());
+            return;
+        }
+
+        SwingUtilities.invokeLater(() -> {
+            ImageIcon original = new ImageIcon(item.getImagePath());
+            Image scaled = original.getImage().getScaledInstance(480, -1, Image.SCALE_SMOOTH);
+
+            JLabel imageLabel = new JLabel(new ImageIcon(scaled));
+            JLabel infoLabel  = new JLabel(item.toString(), SwingConstants.CENTER);
+            infoLabel.setBorder(BorderFactory.createEmptyBorder(6, 8, 8, 8));
+
+            JPanel panel = new JPanel(new BorderLayout());
+            panel.add(imageLabel, BorderLayout.CENTER);
+            panel.add(infoLabel,  BorderLayout.SOUTH);
+
+            JFrame frame = new JFrame("[" + item.getId() + "] " + item.getItemName());
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.getContentPane().add(panel);
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        });
+    }
+
+    // ── 입력 헬퍼 ────────────────────────────────────────────────────
     private static Category selectCategory(Scanner scanner) {
         System.out.println("카테고리");
         Category[] categories = Category.values();
