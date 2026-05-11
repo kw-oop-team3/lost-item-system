@@ -5,23 +5,30 @@ import java.util.Optional;
 
 public class LostItemRepository {
     private List<LostItem> items = new ArrayList<>();
-
+    
     public void save(LostItem item) {
-        // TODO: 구현
+        if (item != null) {
+            items.add(item);
+        }
     }
-
+           
     public List<LostItem> findAll() {
-        // TODO: 구현
-        return null;
+        return new ArrayList<>(items);
     }
-
+    
     public Optional<LostItem> findById(int id) {
-        // TODO: 구현
+        for (LostItem item : items) {
+            if(item.getId() == id) {
+                return Optional.of(item);
+            }
+        }
         return Optional.empty();
     }
 
     public List<LostItem> search(SearchStrategy strategy, String keyword) {
-        // TODO: 구현
-        return null;
+        if (strategy == null) {
+            return new ArrayList<>();
+        }
+        return strategy.search(items, keyword);
     }
 }
