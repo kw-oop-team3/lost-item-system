@@ -1,3 +1,6 @@
+package search;
+
+import item.LostItem;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,10 +16,10 @@ public class LocationSearchStrategy implements SearchStrategy {
 
         String lowerKeyword = keyword.toLowerCase();
 
-        for(LostItem item : items) {
+        for (LostItem item : items) {
             String foundLocation = "";
 
-            if(item.getFoundLocation() != null) {
+            if (item.getFoundLocation() != null) {
                 foundLocation = item.getFoundLocation().getDisplayName();
             }
 

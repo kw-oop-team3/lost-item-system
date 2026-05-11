@@ -1,3 +1,6 @@
+package search;
+
+import item.LostItem;
 import java.util.ArrayList;
 import java.util.List;
 

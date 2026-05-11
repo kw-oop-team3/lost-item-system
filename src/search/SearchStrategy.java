@@ -1,4 +1,6 @@
+package search;
 
+import item.LostItem;
 import java.util.List;
 
 public interface SearchStrategy {

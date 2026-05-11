@@ -1,3 +1,4 @@
+package item;
 
 public enum ItemStatus {
     STORED("보관 중"),

@@ -1,10 +1,20 @@
+package item;
 
 public enum Location {
-    NURI("누리관"),
+    HWADO("화도관"),
+    BIMA("비마관"),
+    OKUI("옥의관"),
     LIBRARY("중앙도서관"),
-    ENGINEERING("공학관"),
-    STUDENT_HALL("학생회관"),
-    BITGOEUL("빛고을관"),
+    WELFARE("복지관"),
+    RESEARCH("연구관"),
+    CHAMBBIT("참빛관"),
+    HANUL("한울관"),
+    NURI("누리관"),
+    SAEBBIT("새빛관"),
+    BITSOL("빛솔재"),
+    OPEN_THEATER("노천극장"),
+    DONGHAE("동해문화예술관"),
+    ANNIVERSARY("80주년 기념관"),
     ETC("기타");
 
     private final String displayName;

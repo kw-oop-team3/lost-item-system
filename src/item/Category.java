@@ -1,3 +1,4 @@
+package item;
 
 public enum Category {
     ELECTRONICS("전자기기"),

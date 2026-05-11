@@ -1,4 +1,7 @@
+package service;
 
+import item.ItemStatus;
+import user.User;
 
 public class ReturnService {
     private ItemService itemService;
@@ -8,6 +11,10 @@ public class ReturnService {
     }
 
     public void returnItem(User user, int itemId) {
-        // TODO: 구현
+        if (!user.canChangeStatus()) {
+            System.out.println("반환 처리 권한이 없습니다.");
+            return;
+        }
+        itemService.changeStatus(user, itemId, ItemStatus.RETURNED);
     }
 }

@@ -1,3 +1,4 @@
+package item;
 
 import java.time.LocalDate;
 
@@ -16,7 +17,13 @@ public class LostItem {
     public LostItem(String itemName, Category category,
                     Location foundLocation, String storageLocation,
                     LocalDate foundDate) {
-        // TODO: 구현
+        this.id = idCounter++;
+        this.itemName = itemName;
+        this.category = category;
+        this.foundLocation = foundLocation;
+        this.storageLocation = storageLocation;
+        this.foundDate = foundDate;
+        this.status = ItemStatus.STORED;
     }
 
     public int getId() { return id; }
@@ -33,7 +40,13 @@ public class LostItem {
 
     @Override
     public String toString() {
-        // TODO: 구현
-        return "";
+        return String.format("[%d] %s | %s | 발견: %s | 보관: %s | %s | %s",
+                id,
+                itemName,
+                category != null ? category.getDisplayName() : "-",
+                foundLocation != null ? foundLocation.getDisplayName() : "-",
+                storageLocation != null ? storageLocation : "-",
+                foundDate != null ? foundDate.toString() : "-",
+                status != null ? status.getDisplayName() : "-");
     }
 }
