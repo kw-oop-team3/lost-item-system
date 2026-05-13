@@ -19,27 +19,18 @@ public class ItemService {
     public LostItem registerItem(User user, String itemName, Category category,
                                   Location foundLocation, String storageLocation,
                                   LocalDate foundDate) {
-        if (!user.canRegisterItem()) {
-            System.out.println("분실물 등록 권한이 없습니다.");
-            return null;
-        }
+        if (!user.canRegisterItem()) return null;
         LostItem item = new LostItem(itemName, category, foundLocation, storageLocation, foundDate);
         repository.save(item);
         return item;
     }
 
-    public void changeStatus(User user, int itemId, ItemStatus newStatus) {
-        if (!user.canChangeStatus()) {
-            System.out.println("상태 변경 권한이 없습니다.");
-            return;
-        }
+    public boolean changeStatus(User user, int itemId, ItemStatus newStatus) {
+        if (!user.canChangeStatus()) return false;
         Optional<LostItem> opt = repository.findById(itemId);
-        if (!opt.isPresent()) {
-            System.out.println("해당 ID의 분실물을 찾을 수 없습니다: " + itemId);
-            return;
-        }
+        if (!opt.isPresent()) return false;
         opt.get().setStatus(newStatus);
-        System.out.println("상태 변경 완료: " + opt.get().getItemName() + " → " + newStatus.getDisplayName());
+        return true;
     }
 
     public LostItemRepository getRepository() { return repository; }

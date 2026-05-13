@@ -10,11 +10,8 @@ public class ReturnService {
         this.itemService = itemService;
     }
 
-    public void returnItem(User user, int itemId) {
-        if (!user.canChangeStatus()) {
-            System.out.println("반환 처리 권한이 없습니다.");
-            return;
-        }
-        itemService.changeStatus(user, itemId, ItemStatus.RETURNED);
+    public boolean returnItem(User user, int itemId) {
+        if (!user.canChangeStatus()) return false;
+        return itemService.changeStatus(user, itemId, ItemStatus.RETURNED);
     }
 }
